@@ -1,3 +1,7 @@
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
+
 SCHEDULING_ADVISOR_PROMPT = """You are the Scheduling Advisor for an SMS recruitment chatbot hiring for a Python Developer position.
  
 Your job is to evaluate the conversation history and determine whether it is the right time to schedule an  interview.
@@ -27,3 +31,24 @@ Respond with a JSON object:
   "suggested_slots": ["slot1", "slot2", "slot3"] or null
 }
 """
+
+# NOTE: This is a simplified version that only makes the schedule/dont_schedule decision.
+# Once the SQL function-calling tool is ready, this function will also:
+#   1. Query the database for available time slots (filtered by position and date)
+#   2. Pass the available slots to the LLM so it can suggest the 3 nearest ones
+#   3. Return the suggested_slots in the response instead of null
+def get_scheduling_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
+
+    parser = JsonOutputParser()
+
+    # Create a ChatPromptTemplate:
+    prompt = ChatPromptTemplate.from_messages([
+         ("system", SCHEDULING_ADVISOR_PROMPT),
+         ("user", "{input}")
+    ])
+
+    # Chain the prompt with the llm using the pipe operator:
+    chain = prompt | llm | parser
+
+    # Invoke the chain, passing in the conversation_history and return the result:
+    return chain.invoke({"input": conversation_history})
