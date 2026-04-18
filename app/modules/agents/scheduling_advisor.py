@@ -38,17 +38,16 @@ Respond with a JSON object:
 #   2. Pass the available slots to the LLM so it can suggest the 3 nearest ones
 #   3. Return the suggested_slots in the response instead of null
 def get_scheduling_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
+	parser = JsonOutputParser()
 
-    parser = JsonOutputParser()
+	# Create a ChatPromptTemplate:
+	prompt = ChatPromptTemplate.from_messages([
+		("system", SCHEDULING_ADVISOR_PROMPT),
+		("user", "{input}")
+	])
 
-    # Create a ChatPromptTemplate:
-    prompt = ChatPromptTemplate.from_messages([
-         ("system", SCHEDULING_ADVISOR_PROMPT),
-         ("user", "{input}")
-    ])
+	# Chain the prompt with the llm using the pipe operator:
+	chain = prompt | llm | parser
 
-    # Chain the prompt with the llm using the pipe operator:
-    chain = prompt | llm | parser
-
-    # Invoke the chain, passing in the conversation_history and return the result:
-    return chain.invoke({"input": conversation_history})
+	# Invoke the chain, passing in the conversation_history and return the result:
+	return chain.invoke({"input": conversation_history})

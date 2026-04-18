@@ -31,16 +31,15 @@ Respond with a JSON object:
 """
 
 def get_exit_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
-
     parser = JsonOutputParser()
 
-    # Create a ChatPromptTemplate:
+	# Create a ChatPromptTemplate:
     prompt = ChatPromptTemplate.from_messages([
-        ("system", EXIT_ADVISOR_PROMPT),
-        ("user", "{input}")
-    ])
+		("system", EXIT_ADVISOR_PROMPT),
+		("user", "{input}")
+	])
 
-    # Chain the prompt with the llm using the pipe operator:
+	# Chain the prompt with the llm using the pipe operator:
     chain = prompt | llm | parser
 
     # Invoke the chain, passing in the conversation_history and return the result:
