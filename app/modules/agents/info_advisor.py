@@ -27,11 +27,11 @@ In both cases, formulate a response message that:
  - Is concise and professional — this is SMS
  
 Respond with a JSON object:
-{
+{{
   "action": "info_needed" | "info_not_needed",
   "query": "question to look up in job description" or null,
   "response": "your suggested SMS message to the candidate"
-}
+}}
 """
 
 # NOTE: This is a simplified version that always returns info_not_needed.

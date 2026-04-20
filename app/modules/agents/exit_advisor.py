@@ -24,10 +24,10 @@ Use when:
 - There is still useful information to gather or share
 
 Respond with a JSON object:
-{
+{{
   "action": "end" | "dont_end",
   "reason": "brief explanation for your decision"
-}
+}}
 """
 
 def get_exit_advice(conversation_history: str, llm: ChatOpenAI) -> dict:

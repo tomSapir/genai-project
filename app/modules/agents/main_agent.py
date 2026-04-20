@@ -40,10 +40,10 @@ RULES:
  - After confirming an interview, end the conversation
 
 You will receive the conversation history. Respond with a JSON object:
-{
+{{
   "action": "continue" | "schedule" | "end",
   "response": "your SMS message to the candidate"
-}
+}}
 """
 
 def get_main_agent_response(conversation_history: str, llm: ChatOpenAI) -> dict:

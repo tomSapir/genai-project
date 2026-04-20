@@ -25,11 +25,11 @@ Use when:
 When action is "schedule", you will also receive available time slots from the recruiter's calendar. Suggest the three nearest available slots to the candidate.
  
 Respond with a JSON object:
-{
+{{
   "action": "schedule" | "dont_schedule",
   "reason": "brief explanation for your decision",
   "suggested_slots": ["slot1", "slot2", "slot3"] or null
-}
+}}
 """
 
 # NOTE: This is a simplified version that only makes the schedule/dont_schedule decision.
