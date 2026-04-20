@@ -1,3 +1,7 @@
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
+
 EXIT_ADVISOR_PROMPT = """You are the Exit Advisor for an SMS recruitment chatbot hiring for a Python Developer position.
 
 Your job is to evaluate the conversation history and determine whether the conversation should end.
@@ -20,8 +24,28 @@ Use when:
 - There is still useful information to gather or share
 
 Respond with a JSON object:
-{
+{{
   "action": "end" | "dont_end",
   "reason": "brief explanation for your decision"
-}
+}}
 """
+
+def get_exit_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
+    parser = JsonOutputParser()
+
+	# Create a ChatPromptTemplate:
+    prompt = ChatPromptTemplate.from_messages([
+		("system", EXIT_ADVISOR_PROMPT),
+		("user", "{input}")
+	])
+
+	# Chain the prompt with the llm using the pipe operator:
+    chain = prompt | llm | parser
+
+    # Invoke the chain, passing in the conversation_history and return the result:
+    return chain.invoke({"input": conversation_history})
+
+
+
+
+
