@@ -24,8 +24,8 @@ from pathlib import Path
 from sqlalchemy import Boolean, Column, Date, Integer, String, Time, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session
 
-# DB file lives at genai-project/data/tech.db
-_DB_PATH = Path(__file__).parent.parent.parent / "data" / "tech.db"
+# DB file lives at genai-project/data/tech.db (5 levels up from this file)
+_DB_PATH = Path(__file__).parent.parent.parent.parent.parent / "data" / "tech.db"
 _DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 _ENGINE = create_engine(f"sqlite:///{_DB_PATH}", echo=False)
