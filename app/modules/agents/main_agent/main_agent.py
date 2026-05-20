@@ -24,7 +24,7 @@ ACTION: schedule
  - It is appropriate to propose interview time slots
  - The candidate is discussing availability or dates
  - You are confirming a scheduled interview
- 
+
  ACTION: end
  Use when:
  - The candidate explicitly says they are not interested
