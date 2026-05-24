@@ -1,12 +1,13 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from app.modules.agents.info_advisor.pdf_embedder import get_retriever
 
 INFO_ADVISOR_PROMPT = """You are the Info Advisor for an SMS recruitment chatbot hiring for a Python Developer position.
 
 Your job is to help formulate the next message to the candidate, answer their questions, and keep the conversation moving toward scheduling an interview.
 
- You must decide ONE of two actions:
+You must decide ONE of two actions:
 
 ACTION: info_needed
 Use when:
@@ -34,22 +35,62 @@ Respond with a JSON object:
 }}
 """
 
-# NOTE: This is a simplified version that always returns info_not_needed.
-# Once the Chroma vector DB is ready, this function will also:
-#   1. Check if the candidate asked a question requiring job description info
-#   2. Query the vector DB to retrieve relevant information
-#   3. Include that information in the response to the candidate
-def get_info_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
-    parser = JsonOutputParser()
+INFO_ADVISOR_ANSWER_PROMPT = """You are the Info Advisor for an SMS recruitment chatbot hiring for a Python Developer position.
 
-    # Create a ChatPromptTemplate:
-    prompt = ChatPromptTemplate.from_messages([
+The candidate asked a question about the role. Below are the most relevant excerpts from the official Python
+Developer job description, retrieved from our knowledge base.
+
+JOB DESCRIPTION EXCERPTS:
+ {context}
+
+CONVERSATION HISTORY:
+ {conversation_history}
+
+Your task: write the next SMS reply to the candidate.
+
+RULES:
+  - Answer the candidate's question using ONLY the information in the excerpts above
+  - If the excerpts do not contain the answer, say so honestly (e.g. "I'm not sure on that one — I can check with the recruiter")
+  - Do NOT invent details about salary, benefits, location, or requirements that are not in the excerpts
+  - Keep it short and conversational — this is SMS, not an email
+  - After answering, gently steer the conversation toward scheduling an interview
+  - Do not include any preamble like "Here is the answer:" — just write the SMS
+
+Respond with the SMS message text only. No JSON, no quotes, no formatting."""
+
+# Module-level singleton — loading Chroma is expensive, do it once at import.
+_RETRIEVER = get_retriever()
+
+
+def get_info_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
+    """
+    Two-stage flow:
+      1. Ask the LLM to classify whether the candidate's last turn needs JD lookup.
+      2. If it does, retrieve relevant JD chunks from Chroma and ask the LLM
+         again to rewrite the SMS reply grounded in those chunks.
+    Returns the classification dict; when retrieval ran, "response" is the
+    grounded SMS instead of the LLM's first-pass guess.
+    """
+    decision_prompt = ChatPromptTemplate.from_messages([
         ("system", INFO_ADVISOR_PROMPT),
         ("user", "{input}")
     ])
+    decision_chain = decision_prompt | llm | JsonOutputParser()
+    result = decision_chain.invoke({"input": conversation_history})
 
-    # Chain the prompt with the llm using the pipe operator:
-    chain = prompt | llm | parser
+    # Guard both fields — the LLM occasionally returns info_needed with a null query.
+    if result["action"] == "info_needed" and result["query"] is not None:
+        documents = _RETRIEVER.invoke(result["query"])
+        context = "\n".join(doc.page_content for doc in documents)
 
-    # Invoke the chain, passing in the conversation_history and return the result:
-    return chain.invoke({"input": conversation_history})
+        answer_prompt = ChatPromptTemplate.from_messages([
+            ("system", INFO_ADVISOR_ANSWER_PROMPT),
+        ])
+        answer_chain = answer_prompt | llm | StrOutputParser()
+        result["response"] = answer_chain.invoke({
+            "context": context,
+            "conversation_history": conversation_history,
+        })
+
+    return result
+
