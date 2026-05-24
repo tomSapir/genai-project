@@ -85,7 +85,6 @@ def get_main_agent_response(conversation_history: str, llm: ChatOpenAI) -> dict:
 	# For "continue" actions, consult the Info Advisor
 	if action == "continue":
 		info_advice = get_info_advice(conversation_history, llm)
-		# NOTE: once Chroma is integrated, if info_advice["action"] == "info_needed",
-		# we can enrich the response with relevant job information.
+		response["response"] = info_advice["response"]
 
 	return response
