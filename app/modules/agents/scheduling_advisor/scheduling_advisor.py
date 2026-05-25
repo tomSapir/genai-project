@@ -14,20 +14,41 @@ You must decide ONE of two actions:
 
 ACTION: schedule
 Use when ANY of the following is true:
- - The candidate is discussing availability, proposing or accepting a specific
-   time, or explicitly agreeing to schedule an interview
+ - The candidate has just shared ANY non-trivial background about themselves (years of experience, frameworks used, types of projects, technologies) AND no interview slot has been proposed yet. This is enough on its own — the candidate does NOT need to explicitly ask for a meeting.
+ - The candidate is discussing availability, proposing or accepting a specific time, or explicitly agreeing to schedule an interview
  - A previously proposed time was rejected and a new alternative should be offered
- - The candidate has shared some background about themselves and is signaling
-   readiness to book an interview
 
 ACTION: dont_schedule
 Use when ANY of the following is true:
- - The conversation is in its opening exchanges and the candidate has not yet
-   shown any scheduling interest
- - The candidate is asking general questions about the role and has not signaled
-   readiness to schedule
- - The candidate seems hesitant and explicitly needs more information first
- - The candidate has declined the position or asked to stop
+ - The candidate has not yet shared anything about their experience and the conversation is in its opening exchange
+ - The candidate is asking a question about the role (location, stack, compensation, etc.) and that question is still unanswered
+ - The candidate has declined the position or asked to stop being contacted
+
+EXAMPLES:
+
+Example 1 — candidate shared background, no slot proposed yet → schedule
+Conversation:
+Recruiter: How long have you been working with Python?
+Candidate: About four years, mostly on backend services.
+Output: {{"action": "schedule", "reason": "Candidate has shared experience; time to propose interview slots."}}
+
+Example 2 — candidate asking an unanswered question about the role → dont_schedule
+Conversation:
+Recruiter: Hi, could you tell me about your Python experience?
+Candidate: I've used Flask for a couple of years. Is the role remote or hybrid?
+Output: {{"action": "dont_schedule", "reason": "Candidate has an open question about the role; answer it before scheduling."}}
+
+Example 3 — previously proposed slot rejected → schedule
+Conversation:
+Recruiter: Could we do Tuesday at 10 AM or Wednesday at 2 PM?
+Candidate: Those don't work for me. Any other times?
+Output: {{"action": "schedule", "reason": "Candidate rejected the proposed slots and is open to alternatives."}}
+
+Example 4 — candidate declined → dont_schedule
+Conversation:
+Recruiter: How about Wednesday at 10 AM?
+Candidate: Please remove me from your list, I'm not interested anymore.
+Output: {{"action": "dont_schedule", "reason": "Candidate has asked to stop; do not propose further slots."}}
 
 Respond with a JSON object:
 {{

@@ -11,7 +11,7 @@ You must decide ONE of two actions:
 
 ACTION: info_needed
 Use when:
- - The candidate asked a question about the position, company, or role
+ - The candidate asked a question about the position, company, or role (technologies used, work model, requirements, benefits, etc.)
  - You need to retrieve information from the job description to answer accurately
 In this case, set "query" to the candidate's question so relevant information
 can be looked up. Leave "response" as null — it will be filled in after retrieval.
@@ -19,10 +19,36 @@ can be looked up. Leave "response" as null — it will be filled in after retrie
 ACTION: info_not_needed
 Use when:
  - The candidate is sharing their background or experience
- - The candidate is asking to schedule, agreeing, declining, or making small talk
+ - The candidate is discussing availability, agreeing to a slot, declining, or making small talk
  - The conversation can continue without looking up information from the JD
 In this case, set both "query" and "response" to null. The Main Agent's
 original draft will be used as the reply.
+
+EXAMPLES:
+
+Example 1 — candidate asks about the tech stack → info_needed
+Conversation:
+Recruiter: Tell me about your Python experience.
+Candidate: I've used Flask for a couple of years. What frameworks does your team work with?
+Output: {{"action": "info_needed", "query": "What frameworks does the team use?", "response": null}}
+
+Example 2 — candidate shares background → info_not_needed
+Conversation:
+Recruiter: Hi, what's your Python background like?
+Candidate: I've been writing Python for four years on backend services.
+Output: {{"action": "info_not_needed", "query": null, "response": null}}
+
+Example 3 — candidate accepting a slot → info_not_needed
+Conversation:
+Recruiter: Could you do Wednesday at 11 AM?
+Candidate: Wednesday at 11 AM works.
+Output: {{"action": "info_not_needed", "query": null, "response": null}}
+
+Example 4 — candidate asks about the work model → info_needed
+Conversation:
+Recruiter: Could you tell me about your SQL background?
+Candidate: I've used Postgres heavily. Is the role remote, hybrid, or onsite?
+Output: {{"action": "info_needed", "query": "Is the role remote, hybrid, or onsite?", "response": null}}
 
 Respond with a JSON object:
 {{
