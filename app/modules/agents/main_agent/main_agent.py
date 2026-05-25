@@ -77,6 +77,10 @@ def get_main_agent_response(conversation_history: str, llm: ChatOpenAI) -> dict:
 		scheduling_advice = get_scheduling_advice(conversation_history, llm)
 
 		if scheduling_advice["action"] == "schedule":
+			# Use the scheduler's slot-grounded SMS when it produced one
+			# (i.e. the DB returned available slots).
+			if "response" in scheduling_advice:
+				response["response"] = scheduling_advice["response"]
 			return response
 		# Scheduling advisor disagrees — override back to continue
 		action = "continue"
