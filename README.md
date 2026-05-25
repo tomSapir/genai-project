@@ -10,7 +10,6 @@
 </p>
 
 ---
-<br></br>
 
 ## Table of Contents
 
@@ -28,7 +27,6 @@
 - [Acknowledgments](#acknowledgments)
 
 ---
-<br></br>
 
 
 ## About The Project
@@ -40,7 +38,6 @@
 </div>
 
 ---
-<br></br>
 
 
 ## Features
@@ -57,7 +54,6 @@
 - [ ] Streamlit Community Cloud deployment _(coming soon!)_
 
 ---
-<br></br>
 
 
 ## Architecture
@@ -72,7 +68,6 @@ Every turn flows through this pipeline:
 3. If an Advisor disagrees with the Main Agent (e.g. the Exit Advisor says *don't end*), the action is demoted back to `continue` and the Info Advisor handles the reply.
 
 ---
-<br></br>
 
 
 ## Getting Started
@@ -114,7 +109,6 @@ python -c "from app.modules.agents.info_advisor.pdf_embedder import build_vector
 The slot SQLite DB (`data/tech.db`) is created and seeded automatically on first use — no manual step required.
 
 ---
-<br></br>
 
 
 ## Usage
@@ -124,7 +118,6 @@ streamlit run streamlit_app/streamlit_main.py
 ```
 
 ---
-<br></br>
 
 
 ## Evaluation
@@ -141,7 +134,6 @@ End-to-end evaluation lives in [`tests/test_evals.ipynb`](tests/test_evals.ipynb
 A label-inconsistency analysis cell at the end of the notebook explains why this is at or near the dataset's ceiling.
 
 ---
-<br></br>
 
 
 ## Fine-Tuning
@@ -157,7 +149,6 @@ EXIT_ADVISOR_MODEL=ft:gpt-4o-mini-...
 `exit_advisor.py` reads this variable and falls back to the base LLM if the fine-tuned model is unreachable.
 
 ---
-<br></br>
 
 
 ## Code Examples
@@ -177,7 +168,6 @@ print(result["response"])  # "Sounds great — could you do Tuesday at 10 AM or 
 ```
 
 ---
-<br></br>
 
 
 ## Project Structure
@@ -214,7 +204,6 @@ genai-project/
 ```
 
 ---
-<br></br>
 
 
 ## To-Do List
@@ -228,7 +217,6 @@ genai-project/
 - [ ] Streamlit Community Cloud deployment
 
 ---
-<br></br>
 
 
 ## Contact
@@ -237,7 +225,6 @@ genai-project/
 Project Link: [https://github.com/tomSapir/genai-project](https://github.com/tomSapir/genai-project)
 
 ---
-<br></br>
 
 
 ## Acknowledgments
