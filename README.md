@@ -119,16 +119,8 @@ The slot SQLite DB (`data/tech.db`) is created and seeded automatically on first
 
 ## Usage
 
-### Streamlit chat UI
-
 ```powershell
 streamlit run streamlit_app/streamlit_main.py
-```
-
-### Console chat
-
-```powershell
-python chat_console.py
 ```
 
 ---
@@ -215,7 +207,6 @@ genai-project/
 │   ├── sms_conversations.json             ← labeled dataset
 │   ├── test_evals.ipynb                   ← evaluation notebook
 │   └── finetune_exit_advisor.ipynb        ← fine-tuning notebook
-├── chat_console.py                        ← CLI chat for local testing
 ├── requirements.txt
 ├── requirements.lock
 ├── .env.example
