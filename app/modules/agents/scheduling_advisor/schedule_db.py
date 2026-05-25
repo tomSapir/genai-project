@@ -7,7 +7,7 @@ Schema:
     Schedule(ScheduleID PK, date DATE, time TIME, position VARCHAR(20), available BIT)
 
 Seed logic (matches the SQL script):
-    - Year 2024, excluding Fridays and Saturdays
+    - Year 2024, excluding Mondays and Saturdays (Tue–Fri & Sun only)
     - Hourly slots 09:00–17:00 (9 slots per day)
     - Positions: 'Python Dev', 'Sql Dev', 'Analyst', 'ML'
     - Availability: pseudo-normal distribution (avg of two uniform draws >= 0.5)
@@ -53,8 +53,8 @@ def _seed(session: Session) -> None:
     random.seed(42)
 
     # weekday() → Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
-    # Excludes Friday and Saturday → skip {4, 5}
-    _SKIP      = {4, 5}
+    # db_Tech.sql excludes Saturday and Monday → skip {0, 5}
+    _SKIP      = {0, 5}
     _TIMES     = [time(h) for h in range(9, 18)]          # 09:00–17:00
     _POSITIONS = ["Python Dev", "Sql Dev", "Analyst", "ML"]
 
