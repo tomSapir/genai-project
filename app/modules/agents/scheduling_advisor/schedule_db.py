@@ -7,10 +7,13 @@ Schema:
     Schedule(ScheduleID PK, date DATE, time TIME, position VARCHAR(20), available BIT)
 
 Seed logic (matches the SQL script):
-    - Year 2024, excluding Saturdays and Mondays
+    - Year 2024, excluding Fridays and Saturdays
     - Hourly slots 09:00–17:00 (9 slots per day)
     - Positions: 'Python Dev', 'Sql Dev', 'Analyst', 'ML'
     - Availability: pseudo-normal distribution (avg of two uniform draws >= 0.5)
+
+The 2024 range is intentional — it matches db_Tech.sql and the
+timestamps in the labeled sms_conversations.json eval set.
 
 Public API:
     get_nearest_slots(reference_date, position, n) -> list[dict]

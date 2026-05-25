@@ -1,3 +1,5 @@
+from datetime import date
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import JsonOutputParser
@@ -46,10 +48,17 @@ You will receive the conversation history. Respond with a JSON object:
 }}
 """
 
-def get_main_agent_response(conversation_history: str, llm: ChatOpenAI) -> dict:
+def get_main_agent_response(
+	conversation_history: str,
+	llm: ChatOpenAI,
+	reference_date: date | None = None,
+) -> dict:
 	"""
 	Main orchestrator - decides an action (continue/schedule/end) and delegates
 	to the appropriate advisor for validation before returning the final response.
+
+	reference_date is forwarded to the Scheduling Advisor as the conversation's
+	"current date" for slot lookup (see get_scheduling_advice for details).
 	"""
 	parser = JsonOutputParser()
 	prompt = ChatPromptTemplate.from_messages([
@@ -74,7 +83,7 @@ def get_main_agent_response(conversation_history: str, llm: ChatOpenAI) -> dict:
 
 	# Validate "schedule" decisions with the Scheduling Advisor
 	if action == "schedule":
-		scheduling_advice = get_scheduling_advice(conversation_history, llm)
+		scheduling_advice = get_scheduling_advice(conversation_history, llm, reference_date)
 
 		if scheduling_advice["action"] == "schedule":
 			# Use the scheduler's slot-grounded SMS when it produced one
