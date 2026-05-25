@@ -13,6 +13,9 @@ Use when:
 - The candidate explicitly states they are not interested in the position
 - The candidate mentions they have already found or accepted another job
 - The candidate asks to stop receiving messages
+- The candidate has just named or accepted a specific time slot
+  (e.g. "Monday at 3 PM is good", "Yes, Thursday works") — the recruiter
+  is about to confirm the booking, so ending the conversation is appropriate
 - The interview has been successfully confirmed and there is nothing left to discuss
 - The candidate is unresponsive or clearly disengaged after multiple attempts
 

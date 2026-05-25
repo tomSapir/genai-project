@@ -13,28 +13,21 @@ Your job is to evaluate the conversation history and determine whether it is the
 You must decide ONE of two actions:
 
 ACTION: schedule
-Use when ALL of the following are true:
- - The candidate has expressed clear interest in the position
- - The recruiter has already asked at least one background question (years of
-   Python experience, current role, relevant projects) AND the candidate has
-   answered it
- - The candidate is discussing availability, preferred times, or has explicitly
-   agreed to schedule an interview
- - OR: a previously proposed time was rejected and a new one should be offered
+Use when ANY of the following is true:
+ - The candidate is discussing availability, proposing or accepting a specific
+   time, or explicitly agreeing to schedule an interview
+ - A previously proposed time was rejected and a new alternative should be offered
+ - The candidate has shared some background about themselves and is signaling
+   readiness to book an interview
 
 ACTION: dont_schedule
-Use when ANY of the following are true:
- - The conversation is still in its opening exchanges
- - The candidate has only said they are "interested" or asked general questions
-   about the role — interest alone is NOT enough
- - The recruiter has not yet gathered any background about the candidate
- - There are still important questions to address before scheduling
- - The candidate seems hesitant and needs more information first
-
-IMPORTANT: Interest alone is not sufficient. Before scheduling, the recruiter
-must have gathered some concrete background about the candidate (experience,
-current role, or skills). If that has not happened yet, choose dont_schedule
-even if the candidate says "yes" to a scheduling question.
+Use when ANY of the following is true:
+ - The conversation is in its opening exchanges and the candidate has not yet
+   shown any scheduling interest
+ - The candidate is asking general questions about the role and has not signaled
+   readiness to schedule
+ - The candidate seems hesitant and explicitly needs more information first
+ - The candidate has declined the position or asked to stop
 
 Respond with a JSON object:
 {{

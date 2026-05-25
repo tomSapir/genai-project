@@ -6,7 +6,7 @@ from app.modules.agents.main_agent import get_main_agent_response
 
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+llm = ChatOpenAI(model="gpt-4.1", temperature=0)
 
 def format_conversation_history(messages: list) -> str:
     role_map = {
