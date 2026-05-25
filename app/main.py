@@ -1,3 +1,5 @@
+from datetime import date
+
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 from app.modules.agents.main_agent import get_main_agent_response
@@ -19,11 +21,13 @@ def format_conversation_history(messages: list) -> str:
         content = msg.get("content", "")
 
         lines.append(f"{role}: {content}")
-    
+
     return "\n".join(lines)
 
 
-def get_bot_response(messages: list) -> dict:
-    return get_main_agent_response(format_conversation_history(messages), llm)
+def get_bot_response(messages: list, reference_date: date | None = None) -> dict:
+    return get_main_agent_response(
+        format_conversation_history(messages), llm, reference_date,
+    )
 
 
