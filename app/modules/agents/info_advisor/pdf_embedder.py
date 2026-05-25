@@ -83,7 +83,12 @@ def get_retriever(k: int = 3):
         retriever = get_retriever(k=3)
         docs = retriever.invoke("What Python frameworks are required?")
     """
-    # Load the existing persisted store — no re-embedding needed
+    # Auto-build the vector store on first use. Required for cold deployments
+    # (e.g. Streamlit Community Cloud) where data/chroma_db/ is gitignored and
+    # therefore absent from a freshly cloned repo.
+    if not (_CHROMA_PATH / "chroma.sqlite3").exists():
+        build_vector_store()
+
     vectorstore = Chroma(
         persist_directory=str(_CHROMA_PATH),
         embedding_function=_EMBEDDINGS,

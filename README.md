@@ -18,6 +18,7 @@
 - [Architecture](#architecture)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
+- [Deployment](#deployment)
 - [Evaluation](#evaluation)
 - [Fine-Tuning](#fine-tuning)
 - [Code Examples](#code-examples)
@@ -98,15 +99,7 @@ copy .env.example .env
 
 Open `.env` and set `OPENAI_API_KEY`. If you have a fine-tuned Exit Advisor model, also set `EXIT_ADVISOR_MODEL=ft:gpt-4o-mini-...` — otherwise leave it commented out and the Exit Advisor will use the base LLM.
 
-### One-time data setup
-
-Build the Chroma vector store from the Job Description PDF (run once):
-
-```powershell
-python -c "from app.modules.agents.info_advisor.pdf_embedder import build_vector_store; build_vector_store()"
-```
-
-The slot SQLite DB (`data/tech.db`) is created and seeded automatically on first use — no manual step required.
+> **Data stores auto-initialize.** The Chroma vector store (`data/chroma_db/`) and the slot SQLite DB (`data/tech.db`) are both created on first use. The first run takes an extra 30–60 seconds while Chroma is built from the Job Description PDF.
 
 ---
 
@@ -116,6 +109,24 @@ The slot SQLite DB (`data/tech.db`) is created and seeded automatically on first
 ```powershell
 streamlit run streamlit_app/streamlit_main.py
 ```
+
+---
+
+
+## Deployment
+
+The app is designed to run on [Streamlit Community Cloud](https://streamlit.io/cloud).
+
+1. Sign in at [share.streamlit.io](https://share.streamlit.io) with the GitHub account that owns this repo.
+2. Click **New app**, select the repo + `main` branch, and set the entry point to `streamlit_app/streamlit_main.py`.
+3. In the **Secrets** section, paste your env vars in TOML format:
+
+   ```toml
+   OPENAI_API_KEY = "sk-..."
+   # EXIT_ADVISOR_MODEL = "ft:gpt-4o-mini-..."
+   ```
+
+4. **Deploy.** The first cold start takes ~30–60 seconds while the Chroma vector store is built from the Job Description PDF; subsequent starts are instant.
 
 ---
 
