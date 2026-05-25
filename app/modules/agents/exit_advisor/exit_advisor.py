@@ -1,6 +1,9 @@
+import os
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
+from openai import AuthenticationError, NotFoundError, PermissionDeniedError
 
 EXIT_ADVISOR_PROMPT = """You are the Exit Advisor for an SMS recruitment chatbot hiring for a Python Developer position.
 
@@ -33,17 +36,33 @@ Respond with a JSON object:
 }}
 """
 
+def _resolve_llm(default_llm: ChatOpenAI) -> ChatOpenAI:
+    # When EXIT_ADVISOR_MODEL is set (typically a fine-tuned `ft:...` id),
+    # the Exit Advisor runs on its own dedicated model rather than the
+    # shared LLM the Main Agent uses for everything else.
+    model_id = os.getenv("EXIT_ADVISOR_MODEL")
+    if not model_id:
+        return default_llm
+    return ChatOpenAI(model=model_id, temperature=0)
+
+
 def get_exit_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
     parser = JsonOutputParser()
 
-    # Create a ChatPromptTemplate:
     prompt = ChatPromptTemplate.from_messages([
         ("system", EXIT_ADVISOR_PROMPT),
         ("user", "{input}")
     ])
 
-    # Chain the prompt with the llm using the pipe operator:
-    chain = prompt | llm | parser
+    resolved = _resolve_llm(llm)
+    payload = {"input": conversation_history}
 
-    # Invoke the chain, passing in the conversation_history and return the result:
-    return chain.invoke({"input": conversation_history})
+    try:
+        return (prompt | resolved | parser).invoke(payload)
+    except (NotFoundError, AuthenticationError, PermissionDeniedError):
+        # EXIT_ADVISOR_MODEL is set but unreachable with this API key — most
+        # commonly because the fine-tuned model belongs to a different OpenAI
+        # org. Fall back to the base llm so the pipeline keeps working.
+        if resolved is llm:
+            raise
+        return (prompt | llm | parser).invoke(payload)
