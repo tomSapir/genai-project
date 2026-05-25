@@ -95,17 +95,13 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Create a `.env` file at the project root with your OpenAI API key:
+Copy the env template and fill in your OpenAI API key:
 
-```env
-OPENAI_API_KEY=sk-...
+```powershell
+copy .env.example .env
 ```
 
-If you have a fine-tuned Exit Advisor model, add:
-
-```env
-EXIT_ADVISOR_MODEL=ft:gpt-4o-mini-...
-```
+Open `.env` and set `OPENAI_API_KEY`. If you have a fine-tuned Exit Advisor model, also set `EXIT_ADVISOR_MODEL=ft:gpt-4o-mini-...` — otherwise leave it commented out and the Exit Advisor will use the base LLM.
 
 ### One-time data setup
 
@@ -221,6 +217,8 @@ genai-project/
 │   └── finetune_exit_advisor.ipynb        ← fine-tuning notebook
 ├── chat_console.py                        ← CLI chat for local testing
 ├── requirements.txt
+├── requirements.lock
+├── .env.example
 └── README.md
 ```
 
