@@ -9,6 +9,10 @@
   A multi-agent SMS chatbot that interacts with candidates applying for a Python Developer position — gathers their background, answers questions about the role, and either schedules an interview or politely ends the conversation.
 </p>
 
+<p align="center">
+  <a href="https://genai-chatbot-project.streamlit.app/"><strong>Live Demo →</strong></a>
+</p>
+
 ---
 
 ## Table of Contents
@@ -52,7 +56,7 @@
 - [x] Streamlit chat UI
 - [x] End-to-end evaluation with accuracy + confusion matrix
 - [x] <span style="color: green; font-weight: bold;">Modular agent package — each advisor lives in its own folder</span>
-- [ ] Streamlit Community Cloud deployment _(coming soon!)_
+- [x] Deployed to [Streamlit Community Cloud](https://genai-chatbot-project.streamlit.app/)
 
 ---
 
@@ -115,7 +119,9 @@ streamlit run streamlit_app/streamlit_main.py
 
 ## Deployment
 
-The app is designed to run on [Streamlit Community Cloud](https://streamlit.io/cloud).
+The app runs live on [Streamlit Community Cloud](https://streamlit.io/cloud) at **[genai-chatbot-project.streamlit.app](https://genai-chatbot-project.streamlit.app/)**.
+
+To deploy your own copy:
 
 1. Sign in at [share.streamlit.io](https://share.streamlit.io) with the GitHub account that owns this repo.
 2. Click **New app**, select the repo + `main` branch, and set the entry point to `streamlit_app/streamlit_main.py`.
@@ -225,7 +231,7 @@ genai-project/
 - [x] Streamlit chat UI
 - [x] End-to-end evaluation with accuracy + confusion matrix
 - [x] Supervised fine-tuning of the Exit Advisor
-- [ ] Streamlit Community Cloud deployment
+- [x] Streamlit Community Cloud deployment
 
 ---
 
