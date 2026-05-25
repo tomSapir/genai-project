@@ -13,25 +13,22 @@ ACTION: info_needed
 Use when:
  - The candidate asked a question about the position, company, or role
  - You need to retrieve information from the job description to answer accurately
-In this case, provide the candidate's question so relevant information can be looked up.
+In this case, set "query" to the candidate's question so relevant information
+can be looked up. Leave "response" as null — it will be filled in after retrieval.
 
 ACTION: info_not_needed
 Use when:
  - The candidate is sharing their background or experience
- - The conversation can continue without looking up additional information
- - You already have enough context to formulate a good response
-
-In both cases, formulate a response message that:
- - Answers the candidate's question if they asked one
- - Acknowledges what the candidate shared
- - Gently steers the conversation toward scheduling an interview
- - Is concise and professional — this is SMS
+ - The candidate is asking to schedule, agreeing, declining, or making small talk
+ - The conversation can continue without looking up information from the JD
+In this case, set both "query" and "response" to null. The Main Agent's
+original draft will be used as the reply.
 
 Respond with a JSON object:
 {{
   "action": "info_needed" | "info_not_needed",
   "query": "question to look up in job description" or null,
-  "response": "your suggested SMS message to the candidate"
+  "response": null
 }}
 """
 
@@ -77,6 +74,11 @@ def get_info_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
     ])
     decision_chain = decision_prompt | llm | JsonOutputParser()
     result = decision_chain.invoke({"input": conversation_history})
+
+    # Defensive: the prompt asks the LLM to leave "response" null on the
+    # decision pass, but enforce it here so the Main Agent can rely on
+    # "response is None" meaning "no grounded reply from me".
+    result["response"] = None
 
     # Guard both fields — the LLM occasionally returns info_needed with a null query.
     if result["action"] == "info_needed" and result["query"] is not None:

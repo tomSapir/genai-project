@@ -21,11 +21,12 @@ Use when:
  - The conversation is still in its early stages
 
 ACTION: schedule
- Use when:
- - The candidate has shown interest and shared enough background
- - It is appropriate to propose interview time slots
- - The candidate is discussing availability or dates
- - You are confirming a scheduled interview
+ Use when ALL of the following are true:
+ - The candidate has shown clear interest in the position
+ - You have already asked the candidate about their background (experience,
+   current role, or relevant skills) AND they have answered
+ - The candidate is discussing availability, agreeing to schedule, or you are
+   confirming an already-scheduled interview
 
  ACTION: end
  Use when:
@@ -95,9 +96,13 @@ def get_main_agent_response(
 		action = "continue"
 		response["action"] = "continue"
 
-	# For "continue" actions, consult the Info Advisor
+	# For "continue" actions, consult the Info Advisor for JD-grounded answers.
+	# When it has nothing to add (info_not_needed, or info_needed but the LLM
+	# returned a null query), keep the Main Agent's own draft — it has the
+	# full system prompt and knows when to ask background questions.
 	if action == "continue":
 		info_advice = get_info_advice(conversation_history, llm)
-		response["response"] = info_advice["response"]
+		if info_advice.get("response") is not None:
+			response["response"] = info_advice["response"]
 
 	return response

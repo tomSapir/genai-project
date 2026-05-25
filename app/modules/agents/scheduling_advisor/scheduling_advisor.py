@@ -13,18 +13,28 @@ Your job is to evaluate the conversation history and determine whether it is the
 You must decide ONE of two actions:
 
 ACTION: schedule
-Use when:
- - The candidate has expressed interest in the position
- - Enough background information has been gathered
- - The candidate is discussing availability or preferred times
- - A previously proposed time was rejected and a new one should be offered
+Use when ALL of the following are true:
+ - The candidate has expressed clear interest in the position
+ - The recruiter has already asked at least one background question (years of
+   Python experience, current role, relevant projects) AND the candidate has
+   answered it
+ - The candidate is discussing availability, preferred times, or has explicitly
+   agreed to schedule an interview
+ - OR: a previously proposed time was rejected and a new one should be offered
 
 ACTION: dont_schedule
-Use when:
- - The conversation is still in its early stages
- - The candidate has not yet shown clear interest
+Use when ANY of the following are true:
+ - The conversation is still in its opening exchanges
+ - The candidate has only said they are "interested" or asked general questions
+   about the role — interest alone is NOT enough
+ - The recruiter has not yet gathered any background about the candidate
  - There are still important questions to address before scheduling
  - The candidate seems hesitant and needs more information first
+
+IMPORTANT: Interest alone is not sufficient. Before scheduling, the recruiter
+must have gathered some concrete background about the candidate (experience,
+current role, or skills). If that has not happened yet, choose dont_schedule
+even if the candidate says "yes" to a scheduling question.
 
 Respond with a JSON object:
 {{
