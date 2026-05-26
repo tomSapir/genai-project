@@ -56,6 +56,8 @@ else:
 
     if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.write(user_input)
 
         try:
             with st.spinner("..."):
