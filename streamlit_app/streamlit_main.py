@@ -13,7 +13,7 @@ Flow:
        reset to start a new conversation.
 
 Session state keys:
-    messages          : list of {"role": "user"|"assistant", "content": str}
+    messages          : list of {"role": "user"|"assistant", "content": str, "timestamp": "HH:MM"}
     conversation_ended: bool — True once the agent returns action="end"
 
 Run locally:
@@ -22,6 +22,8 @@ Run locally:
 
 import sys
 import os
+import time
+from datetime import datetime
 
 # Ensure the project root is on sys.path so app.* imports resolve correctly
 # regardless of the directory Streamlit is launched from.
@@ -29,6 +31,16 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import streamlit as st
 from app.main import get_bot_response
+
+
+def _now_hm() -> str:
+    return datetime.now().strftime("%H:%M")
+
+
+def _stream_words(text: str, delay: float = 0.02):
+    for word in text.split(" "):
+        yield word + " "
+        time.sleep(delay)
 
 st.set_page_config(page_title="SMS Recruitment Chatbot", page_icon="💬", layout="centered")
 st.title("💬 SMS Recruitment Chatbot")
@@ -43,6 +55,9 @@ if "conversation_ended" not in st.session_state:
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
+        ts = msg.get("timestamp")
+        if ts:
+            st.caption(ts)
 
 if st.session_state.conversation_ended:
     # Lock the UI once the agent has ended the conversation
@@ -55,13 +70,14 @@ else:
     user_input = st.chat_input("Type your message here...")
 
     if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
+        user_ts = _now_hm()
+        st.session_state.messages.append({"role": "user", "content": user_input, "timestamp": user_ts})
         with st.chat_message("user"):
             st.write(user_input)
+            st.caption(user_ts)
 
         try:
-            with st.spinner("..."):
-                result = get_bot_response(st.session_state.messages)
+            result = get_bot_response(st.session_state.messages)
         except Exception:
             # Roll back the user message so they can retry cleanly.
             # We don't surface the raw exception — a JSON parser failure
@@ -72,7 +88,13 @@ else:
 
         bot_message = result.get("response", "")
         action = result.get("action", "continue")
-        st.session_state.messages.append({"role": "assistant", "content": bot_message})
+        bot_ts = _now_hm()
+
+        with st.chat_message("assistant"):
+            st.write_stream(_stream_words(bot_message))
+            st.caption(bot_ts)
+
+        st.session_state.messages.append({"role": "assistant", "content": bot_message, "timestamp": bot_ts})
 
         if action == "end":
             st.session_state.conversation_ended = True
