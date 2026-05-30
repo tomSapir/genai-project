@@ -10,6 +10,7 @@ Files:
     Chroma DB  : data/chroma_db/
 """
 
+from functools import lru_cache
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -24,7 +25,12 @@ _PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
 _PDF_PATH     = _PROJECT_ROOT / "data" / "Python Developer Job Description.pdf"
 _CHROMA_PATH  = _PROJECT_ROOT / "data" / "chroma_db"
 
-_EMBEDDINGS = OpenAIEmbeddings(model="text-embedding-3-small")
+
+@lru_cache(maxsize=1)
+def _embeddings() -> OpenAIEmbeddings:
+    # Lazy + cached so importing this module doesn't construct an OpenAI
+    # client (and check for OPENAI_API_KEY) before the caller is ready.
+    return OpenAIEmbeddings(model="text-embedding-3-small")
 
 
 def build_vector_store() -> Chroma:
@@ -57,7 +63,7 @@ def build_vector_store() -> Chroma:
     # Step 3 & 4 — embed chunks and persist to Chroma
     vectorstore = Chroma.from_documents(
         documents=chunks,
-        embedding=_EMBEDDINGS,
+        embedding=_embeddings(),
         persist_directory=str(_CHROMA_PATH),
     )
     print(f"Stored {len(chunks)} chunks in {_CHROMA_PATH}")
@@ -91,6 +97,6 @@ def get_retriever(k: int = 3):
 
     vectorstore = Chroma(
         persist_directory=str(_CHROMA_PATH),
-        embedding_function=_EMBEDDINGS,
+        embedding_function=_embeddings(),
     )
     return vectorstore.as_retriever(search_kwargs={"k": k})

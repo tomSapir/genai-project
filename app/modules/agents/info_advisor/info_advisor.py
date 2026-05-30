@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
@@ -81,8 +83,11 @@ RULES:
 
 Respond with the SMS message text only. No JSON, no quotes, no formatting."""
 
-# Module-level singleton — loading Chroma is expensive, do it once at import.
-_RETRIEVER = get_retriever()
+@lru_cache(maxsize=1)
+def _retriever():
+    # Lazy + cached so importing this module doesn't trigger Chroma load
+    # or an OpenAI key check until the advisor is actually called.
+    return get_retriever()
 
 
 def get_info_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
@@ -108,7 +113,7 @@ def get_info_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
 
     # Guard both fields — the LLM occasionally returns info_needed with a null query.
     if result["action"] == "info_needed" and result["query"] is not None:
-        documents = _RETRIEVER.invoke(result["query"])
+        documents = _retriever().invoke(result["query"])
         context = "\n".join(doc.page_content for doc in documents)
 
         answer_prompt = ChatPromptTemplate.from_messages([
