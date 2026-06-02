@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 
-from app.modules.agents.scheduling_advisor.schedule_db import get_nearest_slots
+from app.modules.agents.scheduling_advisor.schedule_db import get_slots_by_day
 
 SCHEDULING_ADVISOR_PROMPT = """You are the Scheduling Advisor for an SMS recruitment chatbot hiring for a Python Developer position.
 
@@ -70,9 +70,9 @@ CONVERSATION HISTORY:
 Your task: write the next SMS reply to the candidate, proposing these time slots and asking which one works best.
 
 RULES:
-  - Propose all the slots clearly, in a friendly conversational tone
+  - You MUST list ALL THREE slots — do not drop or merge any of them
   - Use ONLY the slots provided above — do not invent dates or times
-  - Keep it short — this is SMS
+  - Keep it friendly and conversational
   - Ask the candidate to pick one or suggest an alternative
   - Do not include any preamble — just write the SMS
 
@@ -87,7 +87,7 @@ def get_scheduling_advice(
 	"""
 	Two-stage flow:
 	  1. Ask the LLM to classify whether it is the right time to schedule.
-	  2. If it is, query the slot DB for the nearest available slots and ask
+	  2. If it is, query the slot DB for the nearest available  3 slots and ask
 	     the LLM again to draft an SMS proposing them.
 	Returns the classification dict; when slots were retrieved, "suggested_slots"
 	holds the DB rows and "response" holds the grounded SMS.
@@ -105,8 +105,11 @@ def get_scheduling_advice(
 	result = decision_chain.invoke({"input": conversation_history})
 
 	if result["action"] == "schedule":
-		ref = reference_date or date.today()
-		slots = get_nearest_slots(ref, "Python Dev", 3)
+		# DB is seeded with 2024 data only. Keep today's month/day but pin
+		# the year to 2024 so slot lookup always hits the seeded range.
+		today = date.today()
+		ref = reference_date or date(2024, today.month, today.day)
+		slots = get_slots_by_day(ref, "Python Dev", 3)
 		result["suggested_slots"] = slots
 
 		if slots:

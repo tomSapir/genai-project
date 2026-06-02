@@ -119,3 +119,43 @@ def get_nearest_slots(
             {"date": str(r.date), "time": str(r.time), "position": r.position}
             for r in rows
         ]
+
+
+def get_slots_by_day(
+    reference_date: date,
+    position: str = "Python Dev",
+    n: int = 3,
+) -> list[dict]:
+    """
+    Return one available slot per day for the n nearest available days.
+    Prevents returning multiple slots on the same day, which confuses the LLM
+    into presenting fewer than n options.
+
+    Args:
+        reference_date: earliest date to consider.
+        position:       one of 'Python Dev', 'Sql Dev', 'Analyst', 'ML'.
+        n:              number of days (slots) to return (default 3).
+
+    Returns:
+        List of dicts: [{"date": "YYYY-MM-DD", "time": "HH:MM:SS", "position": str}]
+    """
+    _init_db()
+    with Session(_ENGINE) as session:
+        rows = (
+            session.query(_Schedule)
+            .filter(
+                _Schedule.date >= reference_date,
+                _Schedule.position == position,
+                _Schedule.available == True,
+            )
+            .order_by(_Schedule.date, _Schedule.time)
+            .all()
+        )
+        seen_dates, slots = set(), []
+        for r in rows:
+            if r.date not in seen_dates:
+                seen_dates.add(r.date)
+                slots.append({"date": str(r.date), "time": str(r.time), "position": r.position})
+            if len(slots) == n:
+                break
+        return slots

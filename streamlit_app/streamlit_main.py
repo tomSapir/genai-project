@@ -77,7 +77,8 @@ else:
             st.caption(user_ts)
 
         try:
-            result = get_bot_response(st.session_state.messages)
+            with st.spinner("Thinking..."):
+                result = get_bot_response(st.session_state.messages)
         except Exception:
             # Roll back the user message so they can retry cleanly.
             # We don't surface the raw exception — a JSON parser failure
