@@ -38,6 +38,17 @@ def _now_hm() -> str:
 
 
 def _stream_words(text: str, delay: float = 0.02):
+    """
+    Generator that yields the response one word at a time with a short pause
+    between each word, creating a typewriter effect in the chat UI.
+
+    Used with st.write_stream() to simulate the feel of a live SMS conversation
+    rather than the entire reply appearing instantly.
+
+    Args:
+        text  : the full bot reply to stream.
+        delay : seconds to wait between words (default 0.02 = 20 ms).
+    """
     for word in text.split(" "):
         yield word + " "
         time.sleep(delay)
