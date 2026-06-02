@@ -105,10 +105,7 @@ def get_scheduling_advice(
 	result = decision_chain.invoke({"input": conversation_history})
 
 	if result["action"] == "schedule":
-		# DB is seeded with 2024 data only. Keep today's month/day but pin
-		# the year to 2024 so slot lookup always hits the seeded range.
-		today = date.today()
-		ref = reference_date or date(2024, today.month, today.day)
+		ref = reference_date or date.today()
 		slots = get_slots_by_day(ref, "Python Dev", 3)
 		result["suggested_slots"] = slots
 
