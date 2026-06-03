@@ -78,6 +78,8 @@ SCHEDULING_ADVISOR_ANSWER_PROMPT = """You are the Scheduling Advisor for an SMS 
 
 The candidate is ready to schedule an interview. Below are the three nearest available time slots from the recruiter's calendar.
 
+Today's date is {today}.
+
 AVAILABLE SLOTS:
  {slots}
 
@@ -97,6 +99,7 @@ RULES:
   - If CANDIDATE'S REQUESTED DATE is not "none" and none of the available slots fall on that date,
     start with a brief apology (e.g. "Unfortunately we don't have availability on [date],")
     then offer the three nearest slots
+  - If the candidate asks what year the slots are in, use the year shown in the slot dates above — do not guess
 
 Respond with the SMS message text only. No JSON, no quotes, no formatting."""
 
@@ -170,6 +173,7 @@ def get_scheduling_advice(
 				"slots": slots_text,
 				"conversation_history": conversation_history,
 				"requested_date": requested_date_str,
+				"today": date.today().isoformat(),
 			})
 
 	return result
