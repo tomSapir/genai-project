@@ -81,6 +81,8 @@ The candidate is ready to schedule an interview. Below are the three nearest ava
 AVAILABLE SLOTS:
  {slots}
 
+CANDIDATE'S REQUESTED DATE: {requested_date}
+
 CONVERSATION HISTORY:
  {conversation_history}
 
@@ -92,6 +94,9 @@ RULES:
   - Keep it friendly and conversational
   - Ask the candidate to pick one or suggest an alternative
   - Do not include any preamble — just write the SMS
+  - If CANDIDATE'S REQUESTED DATE is not "none" and none of the available slots fall on that date,
+    start with a brief apology (e.g. "Unfortunately we don't have availability on [date],")
+    then offer the three nearest slots
 
 Respond with the SMS message text only. No JSON, no quotes, no formatting."""
 
@@ -145,7 +150,8 @@ def get_scheduling_advice(
 
 	if result["action"] == "schedule":
 		# Prefer: explicit reference_date → date mentioned in conversation → today
-		ref = reference_date or _extract_date(conversation_history, llm) or date.today()
+		mentioned_date = reference_date or _extract_date(conversation_history, llm)
+		ref = mentioned_date or date.today()
 		slots = get_slots_by_day(ref, "Python Dev", 3)
 		result["suggested_slots"] = slots
 
@@ -153,6 +159,9 @@ def get_scheduling_advice(
 			slots_text = "\n".join(
 				f"- {s['date']} at {s['time']}" for s in slots
 			)
+			# Tell the prompt what date the candidate requested (if any),
+			# so it can apologise when that date isn't available.
+			requested_date_str = mentioned_date.strftime("%A, %B %-d") if mentioned_date else "none"
 			answer_prompt = ChatPromptTemplate.from_messages([
 				("system", SCHEDULING_ADVISOR_ANSWER_PROMPT),
 			])
@@ -160,6 +169,7 @@ def get_scheduling_advice(
 			result["response"] = answer_chain.invoke({
 				"slots": slots_text,
 				"conversation_history": conversation_history,
+				"requested_date": requested_date_str,
 			})
 
 	return result
