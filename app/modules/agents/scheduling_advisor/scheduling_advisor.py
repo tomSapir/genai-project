@@ -8,11 +8,16 @@ from app.modules.agents.scheduling_advisor.schedule_db import get_slots_by_day
 
 DATE_EXTRACTION_PROMPT = """Today's date is {today}.
 
-Read the conversation below and extract the most recent date or day reference made by either speaker
-(e.g. "next Friday", "Monday", "June 15", "this Thursday").
+Look at the CANDIDATE's messages only and find the most recent date the candidate is asking to hold
+the interview on (e.g. "can we do next Friday?", "how about Monday?", "June 15 works better").
 
-If a specific date is mentioned, resolve it to an exact calendar date based on today's date.
-If no date is mentioned, return null.
+Only count a date the candidate is proposing or requesting for the interview. Return null if:
+ - the candidate did not propose a date
+ - the date was mentioned by the recruiter (including time slots the recruiter already proposed)
+ - it is only a statement of today's date
+ - the candidate is just accepting or confirming a slot the recruiter proposed
+
+If the candidate proposed a date, resolve it to an exact calendar date based on today's date.
 
 Respond with a JSON object:
 {{
@@ -162,9 +167,13 @@ def get_scheduling_advice(
 			slots_text = "\n".join(
 				f"- {s['date']} at {s['time']}" for s in slots
 			)
-			# Tell the prompt what date the candidate requested (if any),
-			# so it can apologise when that date isn't available.
-			requested_date_str = f"{mentioned_date:%A, %B} {mentioned_date.day}" if mentioned_date else "none"
+			# Decide in code whether the candidate's requested date has no slot,
+			# then only pass it through when an apology is actually warranted.
+			# The LLM is unreliable at matching a human-readable date ("Wednesday,
+			# June 3") against the ISO slot list, so we never ask it to.
+			requested_date_str = "none"
+			if mentioned_date and not any(s["date"] == mentioned_date.isoformat() for s in slots):
+				requested_date_str = f"{mentioned_date:%A, %B} {mentioned_date.day}"
 			answer_prompt = ChatPromptTemplate.from_messages([
 				("system", SCHEDULING_ADVISOR_ANSWER_PROMPT),
 			])
