@@ -23,8 +23,8 @@ CREATE TABLE dbo.Schedule
 );
 GO
 
-DECLARE @StartDate DATE = '20240101',
-        @EndDate   DATE = '20241231';
+DECLARE @StartDate DATE = '20260101',
+        @EndDate   DATE = '20261231';
 
 ;WITH
 -- Dates 2024

@@ -49,7 +49,7 @@ class _Schedule(_Base):
 
 
 def _seed(session: Session) -> None:
-    """Populate the Schedule table with 2024 slots (matches db_Tech.sql logic)."""
+    """Populate the Schedule table with 2026 slots (matches db_Tech.sql logic)."""
     random.seed(42)
 
     # weekday() → Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
@@ -58,8 +58,8 @@ def _seed(session: Session) -> None:
     _TIMES     = [time(h) for h in range(9, 18)]          # 09:00–17:00
     _POSITIONS = ["Python Dev", "Sql Dev", "Analyst", "ML"]
 
-    rows, d = [], date(2024, 1, 1)
-    while d <= date(2024, 12, 31):
+    rows, d = [], date(2026, 1, 1)
+    while d <= date(2026, 12, 31):
         if d.weekday() not in _SKIP:
             for t in _TIMES:
                 for pos in _POSITIONS:

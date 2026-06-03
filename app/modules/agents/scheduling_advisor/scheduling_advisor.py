@@ -6,6 +6,23 @@ from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 
 from app.modules.agents.scheduling_advisor.schedule_db import get_slots_by_day
 
+DATE_EXTRACTION_PROMPT = """Today's date is {today}.
+
+Read the conversation below and extract the most recent date or day reference made by either speaker
+(e.g. "next Friday", "Monday", "June 15", "this Thursday").
+
+If a specific date is mentioned, resolve it to an exact calendar date based on today's date.
+If no date is mentioned, return null.
+
+Respond with a JSON object:
+{{
+  "date": "YYYY-MM-DD" or null
+}}
+
+CONVERSATION:
+{conversation_history}
+"""
+
 SCHEDULING_ADVISOR_PROMPT = """You are the Scheduling Advisor for an SMS recruitment chatbot hiring for a Python Developer position.
 
 Your job is to evaluate the conversation history and determine whether it is the right time to schedule an interview.
@@ -79,6 +96,27 @@ RULES:
 Respond with the SMS message text only. No JSON, no quotes, no formatting."""
 
 
+def _extract_date(conversation_history: str, llm: ChatOpenAI) -> date | None:
+	"""
+	Use the LLM to extract and resolve any date mentioned in the conversation
+	(e.g. 'next Friday', 'Monday at 3 PM') into an exact calendar date.
+	Returns None if no date is found or parsing fails.
+	"""
+	prompt = ChatPromptTemplate.from_messages([
+		("system", DATE_EXTRACTION_PROMPT),
+	])
+	chain = prompt | llm | JsonOutputParser()
+	try:
+		result = chain.invoke({
+			"today": date.today().isoformat(),
+			"conversation_history": conversation_history,
+		})
+		raw = result.get("date")
+		return date.fromisoformat(raw) if raw else None
+	except Exception:
+		return None
+
+
 def get_scheduling_advice(
 	conversation_history: str,
 	llm: ChatOpenAI,
@@ -105,7 +143,8 @@ def get_scheduling_advice(
 	result = decision_chain.invoke({"input": conversation_history})
 
 	if result["action"] == "schedule":
-		ref = reference_date or date.today()
+		# Prefer: explicit reference_date → date mentioned in conversation → today
+		ref = reference_date or _extract_date(conversation_history, llm) or date.today()
 		slots = get_slots_by_day(ref, "Python Dev", 3)
 		result["suggested_slots"] = slots
 
