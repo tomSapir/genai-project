@@ -180,8 +180,8 @@ messages = [
 
 result = get_bot_response(messages)
 
-print(result["action"])    # "schedule"
-print(result["response"])  # "Sounds great — could you do Tuesday at 10 AM or Wednesday at 2 PM?"
+print(result["action"])    # e.g. "schedule"
+print(result["response"])  # the grounded SMS reply — here, three upcoming interview slots to choose from
 ```
 
 ---
@@ -211,9 +211,14 @@ genai-project/
 │   ├── tech.db                            ← auto-generated SQLite DB
 │   └── chroma_db/                         ← built by build_vector_store
 ├── tests/
-│   ├── sms_conversations.json             ← labeled dataset
-│   ├── test_evals.ipynb                   ← evaluation notebook
-│   └── finetune_exit_advisor.ipynb        ← fine-tuning notebook
+│   ├── sms_conversations.json             ← labeled dataset (evaluation ground truth)
+│   ├── test_evals.ipynb                   ← evaluation notebook (accuracy + confusion matrix)
+│   ├── finetune_exit_advisor.ipynb        ← Exit Advisor fine-tuning notebook
+│   ├── exit_advisor_train.jsonl           ← Exit Advisor fine-tune training set
+│   ├── exit_advisor_test.jsonl            ← Exit Advisor fine-tune test set
+│   ├── sms_conversations_training.jsonl   ← derived train split (earlier classifier experiments)
+│   ├── sms_conversations_test.jsonl       ← derived test split (earlier classifier experiments)
+│   └── sms_conversations_ft_test.jsonl    ← derived fine-tune test split
 ├── requirements.txt
 ├── requirements.lock
 ├── .env.example
