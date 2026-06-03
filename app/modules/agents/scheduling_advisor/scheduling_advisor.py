@@ -161,7 +161,7 @@ def get_scheduling_advice(
 			)
 			# Tell the prompt what date the candidate requested (if any),
 			# so it can apologise when that date isn't available.
-			requested_date_str = mentioned_date.strftime("%A, %B %-d") if mentioned_date else "none"
+			requested_date_str = f"{mentioned_date:%A, %B} {mentioned_date.day}" if mentioned_date else "none"
 			answer_prompt = ChatPromptTemplate.from_messages([
 				("system", SCHEDULING_ADVISOR_ANSWER_PROMPT),
 			])
