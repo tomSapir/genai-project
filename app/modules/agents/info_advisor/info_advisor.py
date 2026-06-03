@@ -1,3 +1,4 @@
+from datetime import date
 from functools import lru_cache
 
 from langchain_openai import ChatOpenAI
@@ -65,6 +66,8 @@ INFO_ADVISOR_ANSWER_PROMPT = """You are the Info Advisor for an SMS recruitment 
 The candidate asked a question about the role. Below are the most relevant excerpts from the official Python
 Developer job description, retrieved from our knowledge base.
 
+Today's date is {today}.
+
 JOB DESCRIPTION EXCERPTS:
  {context}
 
@@ -75,6 +78,7 @@ Your task: write the next SMS reply to the candidate.
 
 RULES:
   - Answer the candidate's question using ONLY the information in the excerpts above
+  - Exception: for questions about the current date or year, use today's date above — the excerpts won't contain it
   - If the excerpts do not contain the answer, say so honestly (e.g. "I'm not sure on that one — I can check with the recruiter")
   - Do NOT invent details about salary, benefits, location, or requirements that are not in the excerpts
   - Keep it short and conversational — this is SMS, not an email
@@ -123,6 +127,7 @@ def get_info_advice(conversation_history: str, llm: ChatOpenAI) -> dict:
         result["response"] = answer_chain.invoke({
             "context": context,
             "conversation_history": conversation_history,
+            "today": date.today().isoformat(),
         })
 
     return result

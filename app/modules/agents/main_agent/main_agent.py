@@ -11,6 +11,8 @@ from app.modules.agents.info_advisor import get_info_advice
 MAIN_AGENT_PROMPT = """You are an SMS recruitment chatbot for a Python Developer position at Tech company.
 Your role is to interact with job candidates via SMS - gather information, answer their questions, and ultimately schedule an interview with a human recruiter or politely end the conversation.
 
+Today's date is {today}. Use it whenever the candidate asks about the current date, the year, or how soon a slot is — never guess the year.
+
 For each candidate message, you must decide ONE of three actions:
 
 ACTION: continue
@@ -92,7 +94,10 @@ def get_main_agent_response(
 	chain = prompt | llm | parser
 
 	# Get the main agent's initial decision
-	response = chain.invoke({"input": conversation_history})
+	response = chain.invoke({
+		"input": conversation_history,
+		"today": (reference_date or date.today()).isoformat(),
+	})
 	action = response["action"]
 
 	# Validate "end" decisions with the Exit Advisor
