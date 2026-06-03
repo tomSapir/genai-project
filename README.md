@@ -68,7 +68,7 @@ Every turn flows through this pipeline:
 1. **Main Agent** reads the conversation history and proposes an action (`continue` / `schedule` / `end`) plus a draft SMS reply.
 2. The decision is routed to the matching **Advisor** for validation or enrichment:
    - **Exit Advisor** — confirms that ending the conversation is appropriate. Fine-tuned for this binary classification task.
-   - **Scheduling Advisor** — queries the SQL slot DB for the three nearest available slots and rewrites the SMS reply with concrete times.
+   - **Scheduling Advisor** — queries the SQL slot DB for the three nearest available days (one slot per day) and rewrites the SMS reply with concrete times.
    - **Info Advisor** — retrieves relevant chunks from the Job Description via Chroma and rewrites the SMS reply grounded in those chunks.
 3. If an Advisor disagrees with the Main Agent (e.g. the Exit Advisor says *don't end*), the action is demoted back to `continue` and the Info Advisor handles the reply.
 
@@ -239,6 +239,7 @@ genai-project/
 ## Contact
 
 **Tom Sapir** — [tom.sapir@akribis-sys.com](mailto:tom.sapir@akribis-sys.com)
+**Maoz Yeffet** — [maozyeffet@gmail.com](mailto:maozyeffet@gmail.com)
 Project Link: [https://github.com/tomSapir/genai-project](https://github.com/tomSapir/genai-project)
 
 ---

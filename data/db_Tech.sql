@@ -27,7 +27,7 @@ DECLARE @StartDate DATE = '20260101',
         @EndDate   DATE = '20261231';
 
 ;WITH
--- Dates 2024
+-- Dates 2026
 Dates AS
 (
     SELECT @StartDate AS d

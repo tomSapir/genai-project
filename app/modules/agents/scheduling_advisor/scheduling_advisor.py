@@ -131,9 +131,10 @@ def get_scheduling_advice(
 	holds the DB rows and "response" holds the grounded SMS.
 
 	reference_date is the date the conversation took place. The spec asks the
-	advisor to anchor slot lookup to the conversation timestamp (so eval runs
-	against 2024 conversations hit the 2024-seeded DB). For the live Streamlit
-	demo no timestamp is available, so we fall back to date.today().
+	advisor to anchor slot lookup to the conversation timestamp. For the live
+	Streamlit demo no timestamp is passed, so we fall back to a date mentioned
+	in the conversation and finally to date.today() (the slot DB is seeded for
+	the current year, 2026).
 	"""
 	decision_prompt = ChatPromptTemplate.from_messages([
 		("system", SCHEDULING_ADVISOR_PROMPT),

@@ -7,16 +7,18 @@ Schema:
     Schedule(ScheduleID PK, date DATE, time TIME, position VARCHAR(20), available BIT)
 
 Seed logic (matches the SQL script):
-    - Year 2024, excluding Mondays and Saturdays (Tue–Fri & Sun only)
+    - Year 2026, excluding Mondays and Saturdays (Tue–Fri & Sun only)
     - Hourly slots 09:00–17:00 (9 slots per day)
     - Positions: 'Python Dev', 'Sql Dev', 'Analyst', 'ML'
     - Availability: pseudo-normal distribution (avg of two uniform draws >= 0.5)
 
-The 2024 range is intentional — it matches db_Tech.sql and the
-timestamps in the labeled sms_conversations.json eval set.
+The 2026 range matches db_Tech.sql and keeps the live demo usable: slot lookup
+falls back to date.today(), so the DB must hold current-year availability for a
+visitor to ever be offered a slot.
 
 Public API:
-    get_nearest_slots(reference_date, position, n) -> list[dict]
+    get_slots_by_day(reference_date, position, n) -> list[dict]   (current)
+    get_nearest_slots(reference_date, position, n) -> list[dict]  (legacy, unused)
     get_engine() -> SQLAlchemy Engine
 """
 
