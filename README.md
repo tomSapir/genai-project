@@ -243,7 +243,7 @@ genai-project/
 
 ## Contact
 
-**Tom Sapir** — [tom.sapir@akribis-sys.com](mailto:tom.sapir@akribis-sys.com)
+**Tom Sapir** — [tomsapir00@gmail.com](mailto:tomsapir00@gmail.com)
 **Maoz Yeffet** — [maozyeffet@gmail.com](mailto:maozyeffet@gmail.com)
 Project Link: [https://github.com/tomSapir/genai-project](https://github.com/tomSapir/genai-project)
 
